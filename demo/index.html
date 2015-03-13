@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html ng-app='testApp'>
+
+<head>
+    <title>cyTree demo</title>
+    <meta charset='utf-8'>
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <link rel="stylesheet" type="text/css" href="cy-tree.css">
+    <style type="text/css">
+    .unstyled-list {
+        list-style: none;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h3>cyTree v0.0.1</h3>
+            <h4>Features</h4>
+            <ul class="unstyled-list">
+                <li><i class='css-icon icon-success'></i>Based on AngularJs 1.3.x, maybe compatible with AngularJs 1.2.x(not tested).</li>
+                <li><i class='css-icon icon-success'></i>Some style features are CSS3 only, but you can custom/replace it.</li>
+                <li><i class='css-icon icon-success'></i>No jQuery dependency.</li>
+            </ul>
+            <h4>What's good?</h4>
+            <ul class="unstyled-list">
+                <li><i class='css-icon icon-success'></i>You can custom template or use the builtin one.</li>
+                <li><i class='css-icon icon-success'></i>More flexable property name setting.</li>
+                <li><i class='css-icon icon-success'></i>A builtin utility to tranform the jQuery plugin<code>jstree</code> data structure to fit our directive, thus no pain to change.</li>
+            </ul>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <p>
+                    <span class='css-icon icon-success'>success</span>
+                    <span class='css-icon icon-box'>box</span>
+                    <span class='css-icon icon-box-thin'>box-thin</span>
+                    <span class='css-icon icon-box2'><a>box2</a></span>
+                    <span class='css-icon icon-add'><a>add</a></span>
+                    <span class='css-icon icon-minus'><a>minus</a></span>
+                </p>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <h4>Example-1</h4>
+                <p>The class <code>cy-tree</code> provide the base style, and the class <code>with-line</code> add line indicator to the tree.</p>
+                <div ng-controller='Demo1'>
+                    <div class="cy-tree with-line" cy-tree="true" tree-id="tree01" tree-model="data.list1" node-id="id" node-label="name" node-children="list" debug-mode='true'></div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <h4>Example-2</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <script type="text/javascript" src='cy-tree.js'></script>
+    <script type="text/javascript" src='js/app.js'></script>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "cyTree",
+  "version": "1.0.0",
+  "authors": [
+    "creeperyang <pashanhu6@hotmail.com>"
+  ],
+  "description": "A tree plugin based on AngularJs (no jQuery dependency)",
+  "main": "dist/cyTree.js",
+  "keywords": [
+    "tree",
+    "treeview",
+    "angularjs"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.3.14"
+  },
+  "devDependencies": {
+    "bootstrap": "~3.3.2",
+    "fontawesome": "~4.3.0"
+  }
+}
