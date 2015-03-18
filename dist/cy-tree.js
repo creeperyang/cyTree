@@ -218,6 +218,8 @@ app.controller('cyTreeController', function($scope, $q, $log, cyTreeUtils) {
 
     this.$initPromise = deferred.promise;
 
+    this.subTreeCount = 0;
+
     this.init = function(treeData, treeChildFlag, treeLabelFlag, keepRawData, debugMode) {
         log = function () {
             if (debugMode && $log.debug) {
@@ -382,16 +384,19 @@ app.directive('treeData', ['$compile',
             link: function(scope, element, attrs, ctrl) {
 
                 //Rendering template.
-                console.log('-----', ctrl)
                 if(ctrl) {
+                    console.log('ctrl exist')
                     ctrl.$initPromise.then(function(template) {
-                        console.log(template);
-                        //element.html('').append($compile(ctrl.template)(scope));
+                        ctrl.subTreeCount++;
+                        if(ctrl.subTreeCount < 24) {
+                            console.log('current scope', scope.$id, scope);
+                            element.html('').append($compile(ctrl.template)(scope));
+                        }
                     });
-                    console.log(scope, element, attrs, ctrl.template, $compile(ctrl.template)(scope))
+                } else {
+                    console.log('ctrl not exist')
                 }
                 //element.html('').append($compile(ctrl.template)(scope));
-
             }
         };
     }
