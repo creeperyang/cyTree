@@ -35,26 +35,35 @@
                 <li><i class='css-icon icon-success'></i>A builtin utility to tranform the jQuery plugin<code>jstree</code> data structure to fit our directive, thus no pain to change.</li>
             </ul>
         </div>
-        <div class="row">
+        <div class="row" ng-controller='Demo1'>
             <div class="col-sm-12">
                 <p>
-                    <span class='css-icon icon-success'>success</span>
-                    <span class='css-icon icon-box'>box</span>
-                    <span class='css-icon icon-box-thin'>box-thin</span>
-                    <span class='css-icon icon-box2'><a>box2</a></span>
-                    <span class='css-icon icon-add'><a>add</a></span>
-                    <span class='css-icon icon-minus'><a>minus</a></span>
+                    <span class='css-icon icon-success'>icon-success</span>
+                    <span class='css-icon icon-box'>icon-box</span>
+                    <span class='css-icon icon-box-thin'>icon-box-thin</span>
+                    <span class='css-icon icon-box2'>icon-box2</span>
+                    <br>
+                    <span class='css-icon icon-add'>icon-add</span>
+                    <span class='css-icon icon-minus'>icon-minus</span>
+                    <span class='css-icon icon-triangle-right'>icon-triangle-right</span>
+                    <span class='css-icon icon-triangle-right-small'>icon-triangle-right-small</span>
+                    <span class='css-icon icon-triangle-bottom-small'>icon-triangle-bottom-small</span>
                 </p>
             </div>
             <div class="col-sm-12 col-md-6">
-                <h4>Example-1</h4>
+                <h4>Example-1(standard)</h4>
+                <h5>Usage:</h5>
+                <pre ng-non-bindable><code>&lt;div class="cy-tree with-line" cy-tree="true" tree-data="treeData" tree-label-flag="name" tree-child-flag="list" debug-mode="true"&gt;
+&lt;/div&gt;</code></pre>
+                <h5>Description:</h5>
                 <p>The class <code>cy-tree</code> provide the base style, and the class <code>with-line</code> add line indicator to the tree.</p>
-                <div ng-controller='Demo1'>
-                    <div class="cy-tree with-line" cy-tree="true" tree-id="tree01" tree-model="data.list1" node-id="id" node-label="name" node-children="list" debug-mode='true'></div>
+                <div>
+                    <div class="cy-tree with-line" cy-tree tree-data="treeData" tree-label-flag="name" tree-child-flag="list" debug-mode='true'></div>
                 </div>
             </div>
             <div class="col-sm-12 col-md-6">
-                <h4>Example-2</h4>
+                <h4>Example-2(custom template)</h4>
+                <h5>Usage:</h5>
             </div>
         </div>
     </div>

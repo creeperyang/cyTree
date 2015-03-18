@@ -59,6 +59,6 @@ angular.module('testApp.controllers', [])
         $scope.data = {};
         promise.then(function(res) {
             $scope.treeData = res.data;
-        })
-        console.log(promise);
+            $scope.treeData2 = res.data.slice(0);
+        });
     });

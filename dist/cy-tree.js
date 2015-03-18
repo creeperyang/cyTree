@@ -1,19 +1,4 @@
-/* 
-    angular-treeview: the treeview directive
-    tree-id : each tree's unique id.
-    tree-model : the tree model on $scope.
-    node-id : each node's id
-    node-label : each node's label
-    node-children: each node's children
-    <div
-        data-angular-treeview="true"
-        data-tree-id="tree"
-        data-tree-model="roleList"
-        data-node-id="roleId"
-        data-node-label="roleName"
-        data-node-children="children" >
-    </div>
-*/
+
 'use strict';
 
 ;(function(angular) {
@@ -25,54 +10,113 @@ app.service('cyTreeUtils', [function() {
     var uniqueTreeId = 0,
         prefix = 'cyTree';
     
-    /**
-     * @ngdoc method
-     * @name cyTree.service:cyTreeUtils#formatData
-     * @methodOf cyTree.service:cyTreeUtils
-     * @description format an array data to data cyTree prefer
-     *
-     * @param {Array} list original array data, used by jsTree plugin
-     * @param {string} rootFlag root flag
-     * @param {string} parentFlag parent flag
-     * @param {string} currentFlag current id flag
-     * @param {function} eachHandler when iterate list, call eachHandler before any process
-     * @returns {Array} formatted data
-     */
-    var genOriginalTemplate = function() {
+    var genOriginalTemplate = function(treeData, childFlag, labelFlag) {
+        return '<ul>' +
+                '<li ng-class="{\'last-node\': $last, \'has-child\': node.' + childFlag + '.length}" ng-repeat="node in ' + treeData + '">' +
+                '<i class="tree-icon css-icon" ng-if="node.' + childFlag + '.length" ng-click="treeMethods.collapseNode(node)" ng-class="{\'icon-triangle-right-small\': node.collapsed, \'icon-triangle-bottom-small\': !node.collapsed}"></i>' + 
+                '<i class="tree-icon css-icon icon-space" ng-if="!node.' + childFlag + '.length"></i>' + 
+                '<i class="tree-icon css-icon" ng-class="{\'icon-box\': node.nonSelected, \'icon-success\': node.selected, \'icon-box2\': node.partSelected}" ng-click="treeMethods.selectNode(node)"></i>' + 
+                '<span class="tree-label">{{node.' + labelFlag + '}}</span>' +
+                '<div class="cy-sub-tree" ng-if="node.' + childFlag + '.length" ng-hide="node.collapsed" tree-data="node.' + childFlag + '"></div>' +
+                '</li>' +
+            '</ul>';
     };
 
-    var genTemplate = genOriginalTemplate;
+    /**
+     * @ngdoc method
+     * @name cyTree.service:cyTreeUtils#genTemplate
+     * @methodOf cyTree.service:cyTreeUtils
+     * @description generate template, invoked by treeData directive
+     *
+     * @param {string} treeData specify tree data property of (parent) scope
+     * @param {string} childFlag child list property name
+     * @param {string} labelFlag label property name
+     * @returns {string} template
+     */
+    this.genTemplate = genOriginalTemplate;
 
+    /**
+     * @ngdoc method
+     * @name cyTree.service:cyTreeUtils#setTemplateGenerator
+     * @methodOf cyTree.service:cyTreeUtils
+     * @description set template generator
+     *
+     * @param {function} template generator
+     */
+    this.setTemplateGenerator = function(tplGen) {
+        this.genTemplate = tplGen;
+    };
+
+    /**
+     * @ngdoc method
+     * @name cyTree.service:cyTreeUtils#genUniqueId
+     * @methodOf cyTree.service:cyTreeUtils
+     * @description generate unique tree id
+     *
+     * @returns {string} tree id
+     */
     this.genUniqueId = function() {
         return prefix + (++uniqueTreeId);
     };
 
+    /**
+     * @ngdoc method
+     * @name cyTree.service:cyTreeUtils#genUniqueId
+     * @methodOf cyTree.service:cyTreeUtils
+     * @description generate unique tree id
+     *
+     * @returns {number} trees count
+     */
     this.getTreeCount = function() {
         return uniqueTreeId;
     };
 
-    this.iterateTree = function (array, childFlag, callback) {
+    function downTree(array, childFlag, parent, callback, stop) {
         var len = array && array.length,
-            childs,
+            children,
             obj;
         if(!len || !callback) {
             return;
         }
         while(len--) {
             obj = array[len];
-            childs = obj[childFlag];
-            callback(obj);
-            iterate(childs, childFlag, callback);
+            children = obj[childFlag];
+            callback(obj, parent, children);
+            if(stop && stop(obj, parent, children)) {
+                return;
+            }
+            downTree(children, childFlag, obj, callback);
         }
     };
 
-    this.template = function(template) {
-        if(typeof template === 'function') {
-            genTemplate = template;
-        } else {
-            return genTemplate;
+    function upTree(node, parentFlag, callback, stop) {
+        if(!node || !callback) {
+            return;
         }
-    };
+        var parent = node[parentFlag];
+        callback(parent, node);
+        if(stop && stop(parent, node)) {
+            return;
+        }
+        if(parent) {
+            upTree(parent, parentFlag, callback);
+        }
+    }
+
+    /**
+     * @ngdoc method
+     * @name cyTree.service:cyTreeUtils#iterateDown
+     * @methodOf cyTree.service:cyTreeUtils
+     * @description iterate tree data
+     *
+     * @param {array} array tree data
+     * @param {string} childFlag child list property name
+     * @param {object} parent parent node
+     * @param {function} callback when iterate treedata, invoke for every node data
+     */
+    this.iterateDown = downTree;
+    this.iterateUp = upTree;
+
     /*
         data:   [{
                     "text": "零散商户渠道",
@@ -160,114 +204,197 @@ app.service('cyTreeUtils', [function() {
     this.iterate = deep;
 }]);
 
-app.directive('treeModel', ['$q', '$log', '$compile', '$templateCache', 'cyTreeUtils',
+app.controller('cyTreeController', function($scope, $q, $log, cyTreeUtils) {
 
-    function($q, $log, $compile, $templateCache, cyTreeUtils) {
-        function toggleChildren(node, flag) {
-            var children = node.list,
-                i, len;
-            if(children && children.length) {
-                for(i = 0, len = children.length; i < len; i++) {
-                    children[i].selected = flag;
-                    toggleChildren(children[i], flag);
-                }
+    var self = this;
+    var treeMethods, treeId, treeInfo, watch;
+    var log;
+    var deferred = $q.defer();
+
+    $scope.$handling = true;
+    treeMethods = $scope.treeMethods = {};
+    treeId = $scope.treeId = cyTreeUtils.genUniqueId();
+    treeInfo = $scope[treeId] = {}; // tree status and info
+
+    this.$initPromise = deferred.promise;
+
+    this.init = function(treeData, treeChildFlag, treeLabelFlag, keepRawData, debugMode) {
+        log = function () {
+            if (debugMode && $log.debug) {
+                $log.debug.apply(this, arguments);
             }
+        };
+        log('cyTree:about to init, treeData is', treeData);
+        self.template = cyTreeUtils.genTemplate(treeData, treeChildFlag, treeLabelFlag);
+        deferred.resolve(self.template);
+        if(!keepRawData) {
+            watch = $scope.$watch(treeData, function(newData, oldData) {
+                if(newData !== undefined) {
+                    log('cyTree:handle raw data', newData);
+                    watch(); // remove watch;
+                    cyTreeUtils.iterateDown($scope[treeData], treeChildFlag, null, function(item, parent, children) {
+                        var count, 
+                            countDup = 0, 
+                            selectedCount = 0;
+                        item.parent = parent;
+                        if(!children || !children.length) {
+                            item.selectedCount = 0;
+                            item.leafNode = true; // set leaf node flag
+                        } else {
+                            countDup = count = children.length;
+                            while(count--) {
+                                if(children[count].selected) {
+                                    selectedCount++;
+                                }
+                            }
+                            item.selectedCount = selectedCount;
+                        }
+                        setNodeStatus(item, selectedCount, countDup);
+                        item.collapsed = !!item.collapsed;
+                    });
+                }
+            });
         }
+    };
+
+    //Collapse or Expand node when collapse icon clicked
+    treeMethods.collapseNode = function(curNode) {
+        log('cyTree:collapseNode', treeId);
+        curNode.collapsed = !curNode.collapsed;
+        treeInfo.currentCollapsedNode = curNode;
+    };
+
+    //select/deselect node when check icon clicked
+    treeMethods.selectNode = function(node) {
+        if(!node) {
+            return;
+        }
+        log('cyTree:selectNode', treeId);
+
+        var original = node.nonSelected,
+            toSelect = false;
+        // 全选-->不选 部分-->不选 不选-->全选
+        if(original) {
+            node.selected = true;
+            node.nonSelected = node.partSelected = false;
+            toSelect = true;
+        } else {
+            node.nonSelected = true;
+            node.selected = node.partSelected = false;
+        }
+        treeInfo.currentSelectedNode = node;
+        
+        // handle parent chain
+        cyTreeUtils.iterateUp(node, 'parent', function(parentNode, curNode) {
+            if(!parentNode) {
+                return;
+            }
+            if(toSelect) {
+                parentNode.selectedCount++;
+            } else {
+                parentNode.selectedCount--;
+            }
+            setNodeStatus(parentNode, parentNode.selectedCount, parentNode[treeChildFlag].length);
+        }, function(parentNode, curNode) { // whether to stop iterate
+            if(!parentNode) {
+                return true;
+            }
+            return parentNode.partSelected && parentNode.selectedCount > (toSelect ? 1 : 0);
+        });
+
+        if(node.leafNode) {
+            return;
+        }
+        // handle children
+        cyTreeUtils.iterateDown([node], treeChildFlag, null, 
+            function(item, parent, children) {
+                var len = 0;
+                if(node === item) {
+                    return;
+                }
+                if(toSelect) {
+                    if(children) {
+                        len = item.selectedCount = children.length;
+                    }
+                } else {
+                    item.selectedCount = 0;
+                }
+
+                setNodeStatus(item, item.selectedCount, len, toSelect);
+            });
+    };
+
+    function setNodeStatus(node, selectedCount, count, leafSelected) {
+        if(node.leafNode) {
+            if(leafSelected !== undefined) {
+                node.selected = leafSelected;
+                node.nonSelected = !leafSelected;
+            } else {
+                node.selected = !!node.selected;
+                node.nonSelected = !node.selected;
+            }
+            return;
+        }
+        node.selected = false;
+        node.partSelected = false;
+        node.nonSelected = false;
+        if(selectedCount === 0) {
+            node.nonSelected = true;
+        } else if(selectedCount < count) {
+            node.partSelected = true;
+        } else {
+            node.selected = true;
+        }
+    }
+
+});
+
+app.directive('cyTree', ['$q', '$compile',
+    function($q, $compile) {
+        return {
+            restrict: 'A',
+            scope: true,
+            priority: 1,
+            controller: 'cyTreeController',
+            link: function(scope, element, attrs, ctrl) {
+
+                var treeData = attrs.treeData;
+                var treeChildFlag = attrs.treeChildFlag || 'list';
+                var treeLabelFlag = attrs.treeLabelFlag || 'name';
+                var keepRawData = false; // currently set to false
+                ctrl.init(treeData, treeChildFlag, treeLabelFlag, keepRawData, attrs.debugMode);
+                //Rendering template.
+                //console.log(ctrl.template, $compile(ctrl.template)(scope))
+                //element.html('').append($compile(ctrl.template)(scope));
+            }
+        };
+    }
+]);
+app.directive('treeData', ['$compile',
+
+    function($compile) {
 
         return {
             restrict: 'A',
             scope: true,
-            link: function(scope, element, attrs) {
-
-                var log = function () {
-                    if (attrs.debugMode && $log.debug) {
-                        $log.debug.apply(this, arguments);
-                    }
-                };
-
-                log('cyTree:about to init');
-                // whether to handle data 
-                var keepRawData = attrs.keepRawData;
-                var treeData = attrs.treeData;
-                var treeMethods;
-                //tree template
-                var template = $templateCache.get('cy-tree-template/tree.html');
-                if(treeData) {
-                    template.replace(/treeData/g, treeData);
-                } else {
-                    treeData = 'treeData';
-                }
-                if(!keepRawData) {
-                    // default collapsed
-                    cyTreeUtils.iterateTree(scope[treeData], 'list', function(item, children) {
-                        if(!children || !children.length) {
-                            return;
-                        }
-                        item.collapsed = true;
-                    });
-                }
-
-                log('cyTree:inited, (keepRawData, treeData)', keepRawData, treeData);
-
-
-                //root node, only execute once
-                if (attrs.cyTree) {
-
-                    log('cyTree:about to add behavior');
-
-                    treeMethods = scope.treeMethods = scope.treeMethods || {};
-                    scope.treeId = cyTreeUtils.genUniqueId();
-                    
-                    //Collapse or Expand node when collapse icon clicked
-                    scope.treeMethods.collapseNode = treeMethods.collapseNode || function(selectedNode) {
-                        selectedNode.expanded = !selectedNode.expanded;
-                        log('cyTree:collapseNode', scope.treeId);
-                    };
-
-                    //select/deselect node when check icon clicked
-                    scope.treeMethods.selectNode = treeMethods.selectNode || function(selectedNode, parentNode) {
-                        var i,
-                            len,
-                            siblings,
-                            toSelect = true,
-                            original = selectedNode.selected,
-                            current = !original;
-                        selectedNode.selected = current;
-                        //toggleItem(selectedList, selectedListMap, selectedNode, current);
-                        if(parentNode) { // check if need to select parentNode
-                            siblings = parentNode.list;
-                            for(i = 0, len = siblings.length; i < len; i++) {
-                                if(siblings[i].selected !== true) {
-                                    toSelect = false;
-                                    break;
-                                }
-                            }
-                            if(toSelect) { // parent couldn't be shop, no need to add to selectedList
-                                parentNode.selected = true;
-                            } else {
-                                parentNode.selected = false;
-                            }
-                        }
-                        toggleChildren(selectedNode, current);
-                        //set currentNode
-                        scope[treeId].currentNode = selectedNode;
-                        log('cyTree:selectNode', scope.treeId);
-                    };
-                }
-
-                log('cyTree:about to render tree, treeId is', scope.treeId);
+            priority: 0,
+            require: '?^cyTree',
+            link: function(scope, element, attrs, ctrl) {
 
                 //Rendering template.
-                element.html('').append($compile(template)(scope));
+                console.log('-----', ctrl)
+                if(ctrl) {
+                    ctrl.$initPromise.then(function(template) {
+                        console.log(template);
+                        //element.html('').append($compile(ctrl.template)(scope));
+                    });
+                    console.log(scope, element, attrs, ctrl.template, $compile(ctrl.template)(scope))
+                }
+                //element.html('').append($compile(ctrl.template)(scope));
 
             }
         };
     }
 ]);
-
-app.run(['$templateCache', function ($templateCache) {
-    $templateCache.put('cy-tree-template/tree.html', 
-        '<ul><li ng-repeat="node in treeData"><i class="css-icon" ng-if="node.list" ng-click="treeMethods.collapseNode(node)" ng-class="{\'icon-add\': node.collapsed, \'icon-minus\': !node.collapsed}"></i><i class="css-icon" ng-class="{\'icon-box\': node.selected, \'icon-success\': !node.selected}" ng-click="treeMethods.selectNode(node, parentNode)"></i><span>{{node.name}}</span></li></ul>');
-}]);
 
 })(angular);

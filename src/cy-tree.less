@@ -1,41 +1,61 @@
 // compatible with bs3
 
+// make sure style below is in use. (if you don't use bs3 or something like)
+// *, *:after, *:before {
+//     -webkit-box-sizing: border-box;
+//     -moz-box-sizing: border-box;
+//     box-sizing: border-box;
+// }
+
 // variables: custom it as you want
 @theme-red: #C52626;
-
 
 @theme-color: @theme-red;
 @theme-color-reverse: #fff;
 
+@base-padding: 20px; // make sure that it's the same with icon width
+@line-height: 24px; // single line height
+
 .cy-tree {
     ul {
         list-style: none;
-        padding-left: 16px;
+        padding-left: @base-padding;
+    }
+    .tree-label {
+        line-height: @line-height;
     }
     &.with-line {
-        .cy-sub-tree ul {
+        ul {
             position: relative;
             &:before {
                 content: '';
                 position: absolute;
-                left: 6px;
+                left: @base-padding + @base-padding/2;
                 top: 0;
-                bottom: 0;
-                width: 1px;
-                height: 100%;
-                border-left: 1px dashed #333;
+                bottom: @line-height / 2;
+                width: 0;
+                border-left: 1px dashed @theme-color;
             }
-            li {
+            &>li {
                 position: relative;
                 &:before {
                     content: '';
                     position: absolute;
-                    left: -8px;
-                    top: 10px;
+                    left: @base-padding/2;
+                    top: @line-height / 2;
                     bottom: 0;
-                    width: 8px;
+                    width: @base-padding/2;
                     height: 0;
-                    border-bottom: 1px dashed #333;
+                    border-bottom: 1px dashed @theme-color;
+                }
+                &.last-node.has-child:after {
+                    content: '';
+                    position: absolute;
+                    left: @base-padding/2;
+                    top: 0;
+                    bottom: @line-height / 2;
+                    width: 0;
+                    border-left: 1px solid @theme-color-reverse;
                 }
             }
         }
@@ -68,14 +88,14 @@
 }
 .icon-success {
     &:before {
-        left: 0;
+        left: 2px;
         width: 16px;
         height: 16px;
         margin-top: -8px;
         background-color: @theme-color;
     }
     &:after {
-        left: 6px;
+        left: 8px;
         width: 4px;
         height: 8px;
         border-width: 0 2px 2px 0;
@@ -91,14 +111,14 @@
 }
 .icon-box-thin {
     &:before {
-        left: 0;
+        left: 2px;
         width: 16px;
         height: 16px;
         margin-top: -8px;
         background-color: @theme-color;
     }
     &:after {
-        left: 1px;
+        left: 3px;
         width: 14px;
         height: 14px;
         margin-top: -7px;
@@ -107,14 +127,14 @@
 }
 .icon-box {
     &:before {
-        left: 0;
+        left: 2px;
         width: 16px;
         height: 16px;
         margin-top: -8px;
         background-color: @theme-color;
     }
     &:after {
-        left: 2px;
+        left: 4px;
         width: 12px;
         height: 12px;
         margin-top: -6px;
@@ -123,22 +143,15 @@
 }
 .icon-box2 {
     &:before {
-        left: 0;
+        left: 2px;
         width: 16px;
         height: 16px;
         margin-top: -8px;
-        background-color: @theme-color;
+        border: 2px solid @theme-color;
     }
     &:after {
-        left: 2px;
-        width: 12px;
-        height: 12px;
-        margin-top: -6px;
-        background-color: @theme-color-reverse;
-    }
-    &>a:before {
         z-index: 10;
-        left: 3px;
+        left: 5px;
         width: 10px;
         height: 10px;
         margin-top: -5px;
@@ -147,39 +160,72 @@
 }
 .icon-add {
     &:before {
+        left: 2px;
         width: 16px;
         height: 16px;
         margin-top: -8px;
-        background-color: @theme-color;
+        border-left: 7px solid @theme-color;
+        border-right: 7px solid @theme-color;
+        border-top: 3px solid @theme-color;
+        border-bottom: 3px solid @theme-color;
     }
     &:after {
-        left: 3px;
+        left: 5px;
         width: 10px;
         height: 2px;
         margin-top: -1px;
-        background: @theme-color-reverse;
-    }
-    &>a:before {
-        z-index: 10;
-        left: 7px;
-        width: 2px;
-        height: 10px;
-        margin-top: -5px;
         background: @theme-color-reverse;
     }
 }
 .icon-minus {
     &:before {
+        left: 2px;
         width: 16px;
         height: 16px;
         margin-top: -8px;
         background-color: @theme-color;
     }
     &:after {
-        left: 3px;
+        left: 5px;
         width: 10px;
         height: 2px;
         margin-top: -1px;
         background: @theme-color-reverse;
+    }
+}
+.icon-triangle-right {
+    &:before {
+        left: 2px;
+        width: 0;
+        height: 0;
+        margin-top: -8px;
+        border-left: 12px solid @theme-color;
+        border-right: none;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+    }
+}
+.icon-triangle-right-small {
+    &:before {
+        left: 6px;
+        width: 0;
+        height: 0;
+        margin-top: -6px;
+        border-left: 8px solid @theme-color;
+        border-right: none;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+    }
+}
+.icon-triangle-bottom-small {
+    &:before {
+        left: 4px;
+        width: 0;
+        height: 0;
+        margin-top: -4px;
+        border-top: 8px solid @theme-color;
+        border-bottom: none;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
     }
 }
