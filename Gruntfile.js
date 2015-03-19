@@ -107,7 +107,7 @@ module.exports = function(grunt) {
             },
             livereload: {
                 options: {
-                    open: true, // 自动打开浏览器
+                    open: false, // 自动打开浏览器
                     middleware: function(connect) {
                         return [
                             connect().use(
