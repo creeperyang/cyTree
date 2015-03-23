@@ -127,7 +127,6 @@ module.exports = function(grunt) {
                 }
             }
         },
-
         // compile less to css
         less : {
             dist: {
@@ -141,7 +140,6 @@ module.exports = function(grunt) {
             }
         }
     });
-
 
     grunt.registerTask('build', [
         'clean',
@@ -163,8 +161,6 @@ module.exports = function(grunt) {
         ]);
     });
 
-    grunt.registerTask('demo', [
-        'build',
-        'watch'
-    ]);
+    grunt.registerTask('default', ['serve']);
+
 };
