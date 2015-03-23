@@ -36,32 +36,29 @@
             </ul>
         </div>
         <div class="row" ng-controller='Demo1'>
-            <div class="col-sm-12">
-                <p>
-                    <span class='css-icon icon-success'>icon-success</span>
-                    <span class='css-icon icon-box'>icon-box</span>
-                    <span class='css-icon icon-box-thin'>icon-box-thin</span>
-                    <span class='css-icon icon-box2'>icon-box2</span>
-                    <br>
-                    <span class='css-icon icon-add'>icon-add</span>
-                    <span class='css-icon icon-minus'>icon-minus</span>
-                    <span class='css-icon icon-triangle-right'>icon-triangle-right</span>
-                    <span class='css-icon icon-triangle-right-small'>icon-triangle-right-small</span>
-                    <span class='css-icon icon-triangle-bottom-small'>icon-triangle-bottom-small</span>
-                </p>
-            </div>
             <div class="col-sm-12 col-md-6">
                 <h4>Example-1(standard)</h4>
                 <h5>Usage:</h5>
                 <pre ng-non-bindable><code>&lt;div class="cy-tree with-line" cy-tree="true" tree-data="treeData" tree-label-flag="name" tree-child-flag="list" debug-mode="true"&gt;
 &lt;/div&gt;</code></pre>
                 <h5>Description:</h5>
-                <p>The class <code>cy-tree</code> provide the base style, and the class <code>with-line</code> add line indicator to the tree.</p>
+                <ul>
+                    <li>Directive <code>cyTree</code> add default behaviour and handle data.</li>
+                    <li>Directive <code>treeData</code> specifies data.</li>
+                    <li>The class <code>cy-tree</code> provide the base style, and the class <code>with-line</code> add line indicator to the tree.</li>
+                </ul>
                 <div>
                     <div class="cy-tree with-line" cy-tree='true' tree-data="treeData" tree-label-flag="name" tree-child-flag="list" debug-mode='true'></div>
                 </div>
             </div>
             <div class="col-sm-12 col-md-6">
+                <h4>Example-1(remove line indicator)</h4>
+                <h5>Usage:</h5>
+                <pre ng-non-bindable><code>&lt;div class="cy-tree" cy-tree="true" tree-data="treeData2" tree-label-flag="name" tree-child-flag="list" debug-mode="true"&gt;
+&lt;/div&gt;</code></pre>
+                <div>
+                    <div class="cy-tree" cy-tree='true' tree-data="treeData2" tree-label-flag="name" tree-child-flag="list" debug-mode='true'></div>
+                </div>
             </div>
         </div>
     </div>

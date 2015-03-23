@@ -56,9 +56,12 @@ angular.module('testApp.controllers', [])
     .controller('Demo1', function($scope, dataServ) {
         var promise = dataServ.getFormattedData();
 
-        $scope.data = {};
         promise.then(function(res) {
             $scope.treeData = res.data;
-            $scope.treeData2 = res.data.slice(0);
+            $scope.treeData2 = angular.copy(res.data)
+                .slice(1, 3);
+            $scope.treeData2.map(function(d) {
+                d.collapsed = true;
+            })
         });
     });
