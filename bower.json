@@ -5,7 +5,10 @@
     "creeperyang <pashanhu6@hotmail.com>"
   ],
   "description": "A tree plugin based on AngularJs (no jQuery dependency)",
-  "main": "dist/cyTree.js",
+  "main": [
+    "dist/cy-tree.js",
+    "dist/cy-tree.css"
+  ],
   "keywords": [
     "tree",
     "treeview",
