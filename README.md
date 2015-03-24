@@ -23,6 +23,15 @@ Work with modern browsers(Chrome/Firefox/Safari/IE9+).
         npm install && bower install
         grunt serve
 
+Tree images:
+
+![tree](http://creeper-static.qiniudn.com/github-tree1.png)
+
+![tree-select](http://creeper-static.qiniudn.com/github-tree2.png)
+
+
+---
+
 You may run into the `watch ENOSPC` error due to *Inotify Watches Limit*. If so, run command `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`.
 
 ---
