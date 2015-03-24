@@ -10,18 +10,40 @@ This plugin allows you create tree(treeview) easily and you can focus on your da
 
 Work with modern browsers(Chrome/Firefox/Safari/IE9+).
 
-###How to use?
+* The tree uses custom icons(pure css), and the icons depend on CSS3.
+* It's great if you use `bootstap3`. If not, set the `box-sizing` to `content-box`.
 
-1. Make sure you load correct files in your webpage.(include `cy-tree.js` and `cy-tree.css`).
+But you can custom the template or custom the icon style to avoid problems above.
+
+###Usage
+
+####install via bower
+
+The package is registered to bower, so you can install via bower:
+
+```shell
+bower install cytree
+```
+
+####install manually
+
+1. Download and include correct files in your webpage.(include `dist/cy-tree.js` and `dist/cy-tree.css`).
 2. Add dependency to your angular project. 
 3. Use `cyTree` and `treeData` directives to generate tree/treeview.
+
+```html
+<div class="cy-tree with-line" cy-tree='true' tree-data="treeData" tree-label-flag="name" tree-child-flag="list" debug-mode='true'></div>
+```
 
 ###Demo
 
 1. clone this project
-2. run command below
-        npm install && bower install
-        grunt serve
+2. run command below and you can see demo(`http://0.0.0.0:9080/`)
+
+```shell
+npm install && bower install
+grunt serve
+```
 
 Tree images:
 
