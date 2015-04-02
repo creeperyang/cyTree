@@ -15,24 +15,31 @@
     .unstyled-list {
         list-style: none;
     }
+    .cy-tree .fa{
+        width: 14px;
+        text-align: center;
+    }
+    .jumbotron {
+        margin-top: 12px;
+    }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="jumbotron">
-            <h3>cyTree v0.0.1</h3>
+            <h3>cyTree v0.1.0</h3>
             <h4>Features</h4>
             <ul class="unstyled-list">
                 <li><i class='css-icon icon-success'></i>Based on AngularJs 1.3.x, maybe compatible with AngularJs 1.2.x(not tested).</li>
-                <li><i class='css-icon icon-success'></i>Some style features are CSS3 only, but you can custom/replace it.</li>
                 <li><i class='css-icon icon-success'></i>No jQuery dependency.</li>
+                <li><i class='css-icon icon-success'></i>Compatible with modern browsers.</li>
             </ul>
-            <h4>What's good?</h4>
+            <h4>What's great?</h4>
             <ul class="unstyled-list">
-                <li><i class='css-icon icon-success'></i>You can custom template or use the builtin one.</li>
-                <li><i class='css-icon icon-success'></i>More flexable property name setting.</li>
-                <li><i class='css-icon icon-success'></i>A builtin utility to tranform the jQuery plugin<code>jstree</code> data structure to fit our directive, thus no pain to change.</li>
+                <li><i class='css-icon icon-success'></i>You can custom the tree template per <code>cyTree</code> directive via inserting template into <code>cyTree</code>(see example2). Besides, custom <code>cyTreeUtils.genTemplate</code> so you can custom template globally.</li>
+                <li><i class='css-icon icon-success'></i>Flexable property name setting. It means no need to change your data.</li>
+                <li><i class='css-icon icon-success'></i>A builtin method(<code>cyTreeUtils.formatData</code>) to tranform the jQuery plugin<code>jstree</code> data structure to fit our directive, thus no pain to change.</li>
             </ul>
         </div>
         <div class="row" ng-controller='Demo1'>
@@ -44,7 +51,7 @@
                 <h5>Description:</h5>
                 <ul>
                     <li>Directive <code>cyTree</code> add default behaviour and handle data.</li>
-                    <li>Directive <code>treeData</code> specifies data.</li>
+                    <li>Directive <code>treeData</code> correspond with each subtree.</li>
                     <li>The class <code>cy-tree</code> provide the base style, and the class <code>with-line</code> add line indicator to the tree.</li>
                 </ul>
                 <div>
@@ -52,12 +59,31 @@
                 </div>
             </div>
             <div class="col-sm-12 col-md-6">
-                <h4>Example-1(remove line indicator)</h4>
+                <h4>Example-2(custom template)</h4>
                 <h5>Usage:</h5>
                 <pre ng-non-bindable><code>&lt;div class="cy-tree" cy-tree="true" tree-data="treeData2" tree-label-flag="name" tree-child-flag="list" debug-mode="true"&gt;
-&lt;/div&gt;</code></pre>
+    &lt;ul&gt;
+        &lt;li ng-class="{'last-node': $last, 'has-child': node.list.length}" ng-repeat="node in treeData2"&gt;
+            &lt;i class="fa" ng-if="node.list.length" ng-click="treeMethods.collapseNode(node)" ng-class="{'fa-angle-right': node.collapsed, 'fa-angle-down': !node.collapsed}"&gt;&lt;/i&gt;
+            &lt;i class="fa" ng-if="!node.list.length"&gt;&lt;/i&gt;
+            &lt;i class="fa" ng-class="{'fa-square-o': node.nonSelected, 'fa-check-square': node.selected, 'fa-square': node.partSelected}" ng-click="treeMethods.selectNode(node)"&gt;&lt;/i&gt;
+            &lt;span class="tree-label"&gt;{{node.name}}&lt;/span&gt;&lt;div class="cy-sub-tree" ng-if="node.list.length" ng-hide="node.collapsed" tree-data="node.list"&gt;&lt;/div&gt;
+        &lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</code>
+                </pre>
                 <div>
-                    <div class="cy-tree" cy-tree='true' tree-data="treeData2" tree-label-flag="name" tree-child-flag="list" debug-mode='true'></div>
+                    <div class="cy-tree" cy-tree='true' tree-data="treeData2" tree-label-flag="name" tree-child-flag="list" debug-mode='true'>
+                        <ul>
+                            <li ng-class="{'last-node': $last, 'has-child': node.list.length}" ng-repeat="node in treeData2">
+                                <i class="fa" ng-if="node.list.length" ng-click="treeMethods.collapseNode(node)" ng-class="{'fa-angle-right': node.collapsed, 'fa-angle-down': !node.collapsed}"></i>
+                                <i class="fa" ng-if="!node.list.length"></i>
+                                <i class="fa" ng-class="{'fa-square-o': node.nonSelected, 'fa-check-square': node.selected, 'fa-square': node.partSelected}" ng-click="treeMethods.selectNode(node)"></i>
+                                <span class="tree-label">{{node.name}}</span>
+                                <div class="cy-sub-tree" ng-if="node.list.length" ng-hide="node.collapsed" tree-data="node.list"></div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
