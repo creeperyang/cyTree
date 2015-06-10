@@ -199,7 +199,7 @@ app.service('cyTreeUtils', [function() {
             }
             downTree(children, childFlag, obj, callback);
         }
-    };
+    }
 
     function upTree(node, parentFlag, callback, stop) {
         if(!node || !callback) {
@@ -278,10 +278,12 @@ app.service('cyTreeUtils', [function() {
      * @returns {Array} formatted data
      */
     this.formatData = function(list, rootFlag, parentFlag, currentFlag, eachHandler) {
-        if(!list || !list.length) return [];
+        if(!list || !list.length) {
+            return [];
+        }
 
+        eachHandler = eachHandler || angular.noop;
         var len = list.length,
-            eachHandler = eachHandler || angular.noop,
             root,
             map = {};
         while(len--) {
@@ -380,6 +382,8 @@ app.controller('cyTreeController', function($scope, $log, cyTreeUtils) {
             log('cyTree:collapseNode', treeId);
             curNode.collapsed = !curNode.collapsed;
             treeInfo.currentCollapsedNode = curNode;
+            // emit collapse/expand node event
+            $scope.$emit('treecollapse', curNode);
         };
 
         //select/deselect node when check icon clicked
@@ -416,28 +420,29 @@ app.controller('cyTreeController', function($scope, $log, cyTreeUtils) {
             
             cyTreeUtils.handlingNodeUp(node, rule, 'parent', treeChildFlag);
 
-            if(node.leafNode) {
-                return;
+            if(!node.leafNode) {
+                // rules: for child nodes
+                // 1. just the same status with current node
+                cyTreeUtils.iterateDown([node], treeChildFlag, null, 
+                    function(item, parent, children) {
+                        var len = 0;
+                        if(node === item) {
+                            return;
+                        }
+                        if(toSelect) {
+                            if(children) {
+                                len = item.selectedCount = children.length;
+                            }
+                        } else {
+                            item.selectedCount = 0;
+                        }
+
+                        setNodeStatus(item, item.selectedCount, len, toSelect);
+                    });
             }
 
-            // rules: for child nodes
-            // 1. just the same status with current node
-            cyTreeUtils.iterateDown([node], treeChildFlag, null, 
-                function(item, parent, children) {
-                    var len = 0;
-                    if(node === item) {
-                        return;
-                    }
-                    if(toSelect) {
-                        if(children) {
-                            len = item.selectedCount = children.length;
-                        }
-                    } else {
-                        item.selectedCount = 0;
-                    }
-
-                    setNodeStatus(item, item.selectedCount, len, toSelect);
-                });
+            // emit select node event
+            $scope.$emit('treeselect', node);
         };
 
         function setNodeStatus(node, selectedCount, count, leafSelected) {
@@ -506,7 +511,7 @@ app.directive('cyTree', ['$log', '$compile', 'cyTreeUtils',
                     pre: function(scope, element, attrs, ctrl) {
                         ctrl.init(attrs, tpl);
                     }
-                }
+                };
 
             }
         };

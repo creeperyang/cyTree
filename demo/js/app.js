@@ -53,7 +53,7 @@ angular.module('testApp.services', [])
     
 
 angular.module('testApp.controllers', [])
-    .controller('Demo1', function($scope, dataServ) {
+    .controller('Demo1', function($scope, $rootScope, dataServ) {
         var promise = dataServ.getFormattedData();
 
         promise.then(function(res) {
@@ -63,5 +63,12 @@ angular.module('testApp.controllers', [])
             $scope.treeData2.map(function(d) {
                 d.collapsed = true;
             })
+        });
+
+        $rootScope.$on('treecollapse', function(event, node) {
+            console.log('treecollapse', event, node);
+        });
+        $rootScope.$on('treeselect', function(event, node) {
+            console.log('treeselect', event, node);
         });
     });
