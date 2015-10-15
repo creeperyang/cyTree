@@ -11,7 +11,7 @@ This plugin allows you create tree(treeview) easily and you can focus on your da
 Work with modern browsers(Chrome/Firefox/Safari/IE9+).
 
 * The tree uses custom icons(pure css), and the icons depend on CSS3.
-* It's great if you use `bootstap3`. If not, set the `box-sizing` to `content-box`.
+* It's great if you use `bootstap3`. If not, set the `box-sizing` to `border-box`.
 
 **Note**: You can custom the template or custom the icon style to avoid problems above.
 
